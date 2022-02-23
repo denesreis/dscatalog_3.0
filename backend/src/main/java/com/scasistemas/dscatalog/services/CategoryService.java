@@ -1,6 +1,7 @@
 package com.scasistemas.dscatalog.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.scasistemas.dscatalog.dto.CategoryDTO;
 import com.scasistemas.dscatalog.entities.Category;
 import com.scasistemas.dscatalog.repositories.CategoryRepository;
+import com.scasistemas.dscatalog.services.exceptions.EntityNotFoundException;
 
 @Service
 public class CategoryService {
@@ -26,4 +28,15 @@ public class CategoryService {
 		
 	}
 
+	@Transactional(readOnly = true)
+	public CategoryDTO findById(Long id){
+		
+		Optional<Category> obj = repository.findById(id);
+		Category entity = obj.orElseThrow(() -> new EntityNotFoundException("Entidade não localizada"));
+		
+		return new CategoryDTO(entity);
+		
+	}	
+	
+	
 }
