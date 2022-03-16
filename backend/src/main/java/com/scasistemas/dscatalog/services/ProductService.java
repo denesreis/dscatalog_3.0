@@ -12,63 +12,54 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.scasistemas.dscatalog.dto.CategoryDTO;
-import com.scasistemas.dscatalog.entities.Category;
-import com.scasistemas.dscatalog.repositories.CategoryRepository;
+import com.scasistemas.dscatalog.dto.ProductDTO;
+import com.scasistemas.dscatalog.entities.Product;
+import com.scasistemas.dscatalog.repositories.ProductRepository;
 import com.scasistemas.dscatalog.services.exceptions.DatabaseException;
 import com.scasistemas.dscatalog.services.exceptions.ResourceNotFoundException;
 
 @Service
-public class CategoryService {
+public class ProductService {
 	
 	@Autowired
-	private CategoryRepository repository;
+	private ProductRepository repository;
 	
-	/*@Transactional(readOnly = true)
-	public List<CategoryDTO> findAll(){
-		
-		List<Category> list = repository.findAll();
-		
-		return list.stream().map(x -> new CategoryDTO(x)).collect(Collectors.toList());
-		
-	}*/
-
 	@Transactional(readOnly = true) 
-	public Page<CategoryDTO> findAllPaged(PageRequest pageRequest){
+	public Page<ProductDTO> findAllPaged(PageRequest pageRequest){
 		
-		Page<Category> list = repository.findAll(pageRequest);
+		Page<Product> list = repository.findAll(pageRequest);
 		
-		return list.map(x -> new CategoryDTO(x));  //O page já é um stream do java 8  por isso não precisa de converter como no médoto pageall
+		return list.map(x -> new ProductDTO(x));  //O page já é um stream do java 8  por isso não precisa de converter como no médoto pageall
 		
 	}
 	
 	@Transactional(readOnly = true)
-	public CategoryDTO findById(Long id){
+	public ProductDTO findById(Long id){
 		
-		Optional<Category> obj = repository.findById(id);
-		Category entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entidade não localizada"));
+		Optional<Product> obj = repository.findById(id);
+		Product entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entidade não localizada"));
 		
-		return new CategoryDTO(entity);
+		return new ProductDTO(entity,entity.getCategories());
 		
 	}
 	
 	@Transactional
-	public CategoryDTO insert(CategoryDTO dto) {
-		Category entity = new Category();
-		entity.setName(dto.getName());
+	public ProductDTO insert(ProductDTO dto) {
+		Product entity = new Product();
+		//entity.setName(dto.getName());
 		entity = repository.save(entity);
-		return new CategoryDTO(entity);
+		return new ProductDTO(entity);
 		
 		
 	}
 	@Transactional
-	public CategoryDTO update(Long id,CategoryDTO dto) {
+	public ProductDTO update(Long id,ProductDTO dto) {
 		try {
-			Category entity = repository.getOne(id);
-			entity.setName(dto.getName());
+			Product entity = repository.getOne(id);
+			//entity.setName(dto.getName());
 			repository.save(entity);
 			
-			return new CategoryDTO(entity);
+			return new ProductDTO(entity);
 		}
 		catch (EntityNotFoundException e) {
 			throw new ResourceNotFoundException  ("Id not found: "+id);
